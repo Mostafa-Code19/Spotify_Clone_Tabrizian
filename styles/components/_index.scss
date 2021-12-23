@@ -1,0 +1,37 @@
+.index {
+    display: grid;
+    grid-template-columns: .7fr 2fr .5fr;
+}
+
+.listSide {
+    grid-column: 1 / 2;
+}
+
+.mainSide {
+    grid-column: 2 / 3;
+}
+
+.friendSide {
+    grid-column: 3 / 4;
+}
+
+.controller {
+    position: absolute;
+    bottom: 0;
+    width: 100vw;
+    height: 10vh;
+}
+
+.header_profile {
+    height: 100%;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+
+    &_space {
+        width: 2rem;
+        height: 2rem;
+        overflow: hidden;
+        border-radius: 15px;
+    }
+}
