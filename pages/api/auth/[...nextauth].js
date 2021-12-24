@@ -1,12 +1,13 @@
 import NextAuth from "next-auth"
 import SpotifyProvider from "next-auth/providers/spotify"
-import { LOGIN_URL } from "../../../lib/spotify"
+import { log } from "../../../components/base"
+import spotifyApi, { LOGIN_URL } from "../../../lib/spotify"
 
 const refreshAccessToken = async (token) => {
     try {
 
-        spotifyApi.setAccessToken(token.accessToken)
-        spotifyApi.setRefreshToken(token.refreshToken)
+        spotifyApi.setAccessToken(token.access_token)
+        spotifyApi.setRefreshToken(token.refresh_token)
 
         const { body: refreshedToken } = await spotifyApi.refreshAccessToken()
         console.log('refresh token is: ', refreshedToken)
@@ -14,8 +15,8 @@ const refreshAccessToken = async (token) => {
         return { 
             ...token,
             accessToken: refreshedToken.access_token,
-            accessTokenExpires: Data.now() + refreshedToken.expires_in * 1000,
-            refreshToken: refreshedToken.refresh_token ?? token.refreshToken,
+            accessTokenExpires: Date.now() + refreshedToken.expires_in * 86_400_000,
+            refreshToken: refreshedToken.refresh_token ?? token.refresh_token,
         }
 
     } catch (err){
@@ -48,27 +49,27 @@ export default NextAuth({
           if (account && user) {
               return {
                   ...token,
-                  access_token: account.access_token,
-                  refresh_token: account.refresh_token,
+                  accessToken: account.access_token,
+                  refreshToken: account.refresh_token,
                   username: account.providerAccountId,
-                  accessTokenExpires: account.expires_at * 1000,
+                  accessTokenExpires: account.expires_at * 86_400_000,
               }
           }
 
           if (Date.now() < token.accessTokenExpires) {
-              console.log('existing token valid.')
+              log('existing token valid.')
               return token
           }
 
-          console.log('existing token expired.')
+          console.log('existing token expired. refresh')
           return await refreshAccessToken(token)
 
       },
 
       async session({ session, token }) {
-          session.user.accessToken = token.accessToken
-          session.user.refreshToken = token.refreshToken
-          session.user.username = token.username
+          session?.user.accessToken = token.accessToken
+          session?.user.refreshToken = token.refreshToken
+          session?.user.username = token.username
 
           return session
       }
